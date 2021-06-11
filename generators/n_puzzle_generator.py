@@ -11,7 +11,7 @@ def generate_n_puzzle_stdrep(n):
 
     with open(f'../n_puzzle/{n}_puzzle_stdrep.psvn', 'w') as psvn_file:
 
-        psvn_file.write(f'DOMAIN Tile {n}' + newline)
+        psvn_file.write(f'DOMAIN Tile {n + 1}' + newline)
         tile_number = n + 1
         domain = 7 * " " + "b " + " ".join([str(i) for i in range(1, tile_number)])
         psvn_file.write(domain + newline)
