@@ -4,7 +4,7 @@
 #include <utility>
 #include <cstdint>
 #include <stdlib.h>
-#define INFINITY 1000 //May lower it later, have to read about it
+#define INFINITY 10000 //May lower it later, have to read about it
 
 using namespace std;
 
@@ -12,8 +12,8 @@ using namespace std;
 
 //state_map_t * h_map = new_state_map(); // contains the cost-to-goal for all states that have been generated
 state_t state, child, final_state;
-unsigned f_value, h_value, cost;
-int hist;
+unsigned f_value, h_value, cost, bound;
+int hist, new_hist, explored;
 vector<int> path;
 string newline = "\n";
 unsigned mtable0[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -74,15 +74,18 @@ unsigned get_h_value(state_t state){
 }
 
 //Constant memory
-pair<bool, unsigned> f_bounded_dfs_visit_1(unsigned bound, unsigned g_value){
+pair<bool, unsigned> f_bounded_dfs_visit_1(unsigned g_value){
     unsigned current_min;
-    int ruleid;
+    int ruleid, original_history;
     ruleid_iterator_t iter;
+
+    original_history = hist;
 
     h_value = get_h_value(state);
     f_value = g_value + h_value;
 
     if (f_value > bound){
+
         return make_pair(false, f_value);
     }
 
@@ -99,48 +102,61 @@ pair<bool, unsigned> f_bounded_dfs_visit_1(unsigned bound, unsigned g_value){
         if (!fwd_rule_valid_for_history(hist,ruleid)){
             continue;
         }
+        explored++;
+        //cout << "START HISTORY " << hist << "\n";
         hist = next_fwd_history(hist, ruleid);
         cost = g_value + get_fwd_rule_cost(ruleid);
+        //cout << cost << "\n";
         apply_fwd_rule(ruleid, &state, &child);
         copy_state(&state, &child);
 
+
         if (get_h_value(state) < INFINITY){
             path.push_back(ruleid);
-            pair<bool, unsigned> ret_value = f_bounded_dfs_visit_1(bound, cost);
+            pair<bool, unsigned> ret_value = f_bounded_dfs_visit_1(cost);
             if (ret_value.first){
                 return make_pair(true, ret_value.second);
             }
+
             current_min = (ret_value.second < current_min) ? ret_value.second : current_min;
             path.pop_back();
 
         }
 
-        hist = next_bwd_history(hist, ruleid);
+        hist = original_history;
         apply_bwd_rule(ruleid, &state, &child);
+        //cout << "END HISTORY " << hist << "\n";
         copy_state(&state, &child);
 
     }
+
+    return make_pair(false, current_min);
     
 
 }
 
 void ida_search_1(string state_description){
     int64_t totalNodes, numAtD;  // counters
-    unsigned bound;
+    int i;
 
     if (read_state(state_description.c_str(), &state)==-1){
         cout << "Error leyendo el estado inicial" << newline;
     }
 
     bound = get_h_value(state);
-    hist = init_history;
+    //i = 0;
 
     while (true){
-        pair<bool, unsigned> ret_value = f_bounded_dfs_visit_1(bound, 0);
+        hist = init_history;
+        explored = 0;
+        cout << "Nueva iter." << bound << "\n";
+        pair<bool, unsigned> ret_value = f_bounded_dfs_visit_1(0);
         if (ret_value.first){
+            cout << "Costo sol: " << ret_value.second << "\n";
             return;
         }
         bound = ret_value.second;
+        cout << "Explored: " << explored << "\n";
     }
 
 }
@@ -201,6 +217,7 @@ void ida_search_2(string state_description){
     bound = get_h_value(state);
 
     while (true){
+        cout << "Nueva iter." << bound << "\n";
         pair<bool, unsigned> ret_value = f_bounded_dfs_visit_2(state, bound, 0);
         if (ret_value.first){
             return;
@@ -238,8 +255,8 @@ void reconstruct_solution(string state_description){
 }
 
 int main(int argc, char **argv){
-    //string hey = "1 10 15 4 13 6 3 8 2 9 12 7 14 15 b 11";
-    string hey = "1 2 3 4 5 6 7 8 9 10 b 11 13 14 15 12";
+    string hey = "1 10 15 4 13 6 3 8 2 9 12 7 14 5 b 11";
+    //string hey = "11 4 b 8 6 10 5 13 12 7 14 3 1 2 9 15";
     ida_search_1(hey);
     reconstruct_solution(hey);
     cout << "FLAWLESS VICTORY\n";
