@@ -4,6 +4,8 @@
 #include <utility>
 #include <cstdint>
 #include <stdlib.h>
+#include <unistd.h>
+#include "inputOutput.h"
 #define INFINITY 10000 //May lower it later, have to read about it
 
 using namespace std;
@@ -71,6 +73,12 @@ unsigned get_h_value(state_t state){
 
     return h;
 
+}
+
+void sigalrm_handler(int sig){
+    cout << "Explored: " << explored << "\n";
+    cout << "Time's up mate, maybe next time\n";
+    exit(EXIT_SUCCESS);
 }
 
 //Constant memory
@@ -142,6 +150,9 @@ void ida_search_1(string state_description){
     if (read_state(state_description.c_str(), &state)==-1){
         cout << "Error leyendo el estado inicial" << newline;
     }
+
+    signal(SIGALRM, &sigalrm_handler);  // set a signal handler
+    alarm(60);  // set an alarm for 60 seconds from now
 
     bound = get_h_value(state);
     //i = 0;
@@ -227,37 +238,11 @@ void ida_search_2(string state_description){
 
 }
 
-void reconstruct_solution(string state_description){
-    char str_state[40];
-    state_t state, child;
-    vector<int>::iterator iter;
-
-    if (read_state(state_description.c_str(), &state)==-1){
-        cout << "Error leyendo el estado inicial" << newline;
-    }
-
-    sprint_state(str_state, 40, &state);
-
-    cout << str_state << "\n";
-
-    for (iter = path.begin(); iter != path.end(); iter++){
-        apply_fwd_rule(*iter, &state, &child);
-
-        sprint_state(str_state, 40, &child);
-
-        cout << str_state << "\n";
-        copy_state(&state, &child);
-    }
-
-
-
-    
-}
-
 int main(int argc, char **argv){
-    string hey = "1 10 15 4 13 6 3 8 2 9 12 7 14 5 b 11";
+    string hey;
+    get_problem_instace(argv[1], hey);
     ida_search_1(hey);
-    reconstruct_solution(hey);
+    reconstruct_solution(hey, newline, path);
     cout << "FLAWLESS VICTORY\n";
 
     return 0;
