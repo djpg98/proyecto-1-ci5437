@@ -256,7 +256,6 @@ void reconstruct_solution(string state_description){
 
 int main(int argc, char **argv){
     string hey = "1 10 15 4 13 6 3 8 2 9 12 7 14 5 b 11";
-    //string hey = "11 4 b 8 6 10 5 13 12 7 14 3 1 2 9 15";
     ida_search_1(hey);
     reconstruct_solution(hey);
     cout << "FLAWLESS VICTORY\n";

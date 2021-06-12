@@ -1,4 +1,8 @@
 
+#include <vector>
+
+using namespace std;
+
 class Node {
     public:
         state_t* state;    // Estado del nodo
@@ -17,5 +21,13 @@ class Node {
         /* Crea un nuevo nodo a partir de aplicar la acción en el nodo actual */
         Node* make_node(state_t* state, int rule_id) {
             return new Node(state, this, rule_id, get_fwd_rule_cost(rule_id) + this->g);
+        }
+
+        void extract_path(vector<int> &path) {
+            Node* node = this;
+            while (node != NULL && node->parent != NULL ) {
+                path.insert(path.begin(), node->rule_id);
+                node = node->parent;
+            }
         }
 };

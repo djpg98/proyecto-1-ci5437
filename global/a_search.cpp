@@ -14,8 +14,8 @@ using namespace std;
 //VERY IMPORTANT DO NOT FORGET UNDER ANY CIRCUMSTANCES: CHANGE MAX_LENGTH ARGUMENT IN SPRINT STATE
 
 //state_map_t * h_map = new_state_map(); // contains the cost-to-goal for all states that have been generated
-state_t* state;
-state_t child;
+state_t state;
+state_t* child;
 unsigned f_value, h_value, cost;
 int hist;
 vector<int> path;
@@ -74,59 +74,57 @@ void a_star_search(string state_description){
     ruleid_iterator_t iter;
     hist = init_history;
 
-    if (read_state(state_description.c_str(), state)==-1){
+    if (read_state(state_description.c_str(), &state)==-1){
         cout << "Error leyendo el estado inicial" << newline;
+        return;
     }
 
     PriorityQueue<Node*> q;
     map<uint64_t, unsigned> distance;
 
-    Node* node = new Node(state);
-    distance[hash_state(state)] = 0;
-    h_value = get_h_value(state);
+    Node* node = new Node(&state);
+    distance[hash_state(node->state)] = 0;
+    h_value = get_h_value(node->state);
     q.Add(h_value, h_value, node);
+
+    char str_state[40];
 
     while( !q.Empty() ) {
         node = q.Top();
-        state = node->state;
+        q.Pop();
 
-        if (node->g < distance[hash_state(state)]) {
-            distance[hash_state(state)] = node->g;
+        if (node->g < distance[hash_state(node->state)] || !distance.empty()) {
+            distance[hash_state(node->state)] = node->g;
 
             // Estado goal
-            if (is_goal(state)) {
-                cout << "FLAWLESS VICTORY\n";
+            if (is_goal(node->state)) {
+                node->extract_path(path);
                 return;
             }
 
             // Iteramos por los estados hijos del estado actual
-            init_fwd_iter(&iter, state);
+            init_fwd_iter(&iter, node->state);
             while((ruleid = next_ruleid(&iter) ) >= 0){
 
                 if (!fwd_rule_valid_for_history(hist,ruleid)){
                     continue;
                 }
                 hist = next_fwd_history(hist, ruleid);
-                apply_fwd_rule(ruleid, state, &child);
-                copy_state(state, &child);
+                child = new state_t;
+                apply_fwd_rule(ruleid, node->state, child);
 
-                h_value = get_h_value(state);
+                h_value = get_h_value(child);
                 if (h_value < INFINITY) {
                     f_value = node->g + get_fwd_rule_cost(ruleid) + h_value;
-                    q.Add(f_value, f_value, node->make_node(state, ruleid));
-                    cout << state;
+                    q.Add(f_value, f_value, node->make_node(child, ruleid));
                 }
 
                 hist = next_bwd_history(hist, ruleid);
-                apply_bwd_rule(ruleid, state, &child);
-                copy_state(state, &child);
-
             }
         }
 
 
     }
-    cout << "Fuck lol\n";
     return;
 
 }
@@ -153,17 +151,12 @@ void reconstruct_solution(string state_description){
         copy_state(&state, &child);
     }
 
-
-
-    
 }
 
 int main(int argc, char **argv){
-    string hey = "8 b 6 5 4 7 2 3 1";
+    string hey = "1 8 2 b 4 3 7 6 5";
     a_star_search(hey);
-    cout << "FLAWLESS VICTORY\n";
-
+    reconstruct_solution(hey);
     return 0;
-
 }
 
