@@ -13,10 +13,11 @@ using namespace std;
 
 //VERY IMPORTANT DO NOT FORGET UNDER ANY CIRCUMSTANCES: CHANGE MAX_LENGTH ARGUMENT IN SPRINT STATE
 
-//state_map_t * h_map = new_state_map(); // contains the cost-to-goal for all states that have been generated
-state_t state, child, final_state;
+abstraction_t * abst[5];
+state_map_t * pdb[5];
+state_t state, child, abst_state, final_state;
 unsigned f_value, h_value, cost, bound;
-int hist, new_hist, explored;
+int hist,  explored, pdbNumber;
 vector<int> path;
 string newline = "\n";
 unsigned mtable0[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -75,6 +76,18 @@ unsigned get_h_value(state_t state){
     return h;
 
 }
+
+/*unsigned get_h_value(state_t state){
+    int * value_pointer;
+    int total = 0;
+    for (int i = 0; i <  pdbNumber; i++){
+        abstract_state(abst[i], &state, &abst_state);
+        value_pointer = state_map_get(pdb[i], &abst_state);
+        total += (*value_pointer);
+    }
+
+    return total;
+}*/
 
 void sigalrm_handler(int sig){
     cout << "Explored: " << explored << "\n";
@@ -149,6 +162,7 @@ void ida_search_1(string state_description){
 
     if (read_state(state_description.c_str(), &state)==-1){
         cout << "Error leyendo el estado inicial" << newline;
+        exit(EXIT_FAILURE);
     }
 
     signal(SIGALRM, &sigalrm_handler);  // set a signal handler
@@ -272,10 +286,12 @@ void ida_search_2(string state_description){
 }
 
 int main(int argc, char **argv){
-    string hey;
-    get_problem_instace(argv[1], hey);
-    ida_search_1(hey);
-    reconstruct_solution(hey, newline, path);
+    string instance, pdb_name;
+    pdbNumber = 3;
+    get_problem_instace(argv[1],instance);
+    /*load_pdbs(abst, pdb, argv[2], pdbNumber);*/
+    ida_search_1(instance);
+    reconstruct_solution(instance, newline, path);
     cout << "FLAWLESS VICTORY\n";
 
     return 0;

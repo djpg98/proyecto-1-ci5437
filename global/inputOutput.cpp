@@ -33,3 +33,30 @@ void get_problem_instace(string file_name, string & instance){
 
     file.close();
 }
+
+void load_pdbs(abstraction_t** abst, state_map_t** pdb_maps, string name, int pdb_number){
+    
+    ifstream file;
+    string pdb_filename, abst_filename, temp;
+
+    for (int i =0; i !=  pdb_number; i++){
+
+        temp.assign(name);
+        temp.append("_");
+        temp.append(to_string(i));
+
+        pdb_filename.assign(temp);
+        abst_filename.assign(temp);
+
+        pdb_filename.append(".pdb");
+        abst_filename.append(".abst");
+
+        abst[i] = read_abstraction_from_file(abst_filename.c_str());
+
+        FILE *pdb_file = fopen(pdb_filename.c_str(), "r");
+        pdb_maps[i] = read_state_map(pdb_file);
+        fclose(pdb_file);
+
+
+    }  
+}

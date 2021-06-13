@@ -1,7 +1,7 @@
 CC = gcc
 CXX = g++
 OPT = -std=c++11 -g
-PSVNOPT = --no_state_map --no_abstraction --fwd_history_len=2 --bwd_history_len=0 --verbosity=1
+PSVNOPT = --state_map --abstraction --fwd_history_len=1 --bwd_history_len=0 --verbosity=1
 
 psvn2c_core.c:
 	cp ../src/psvn2c_core.c ./psvn2c_core.c
@@ -21,6 +21,34 @@ psvn2c_abstraction.c:
 %.succ: %.c ../global/ida_search.cpp
 	$(CXX) $(OPT) ../global/ida_search.cpp -include $< ../global/inputOutput.cpp -o $@
 	rm -f $*.c
+
+%.dist: %.c ../global/dist.cpp
+	@echo "**** Constructing $@ ..."
+	@$(CXX) $(OPT) ../global/dist.cpp -include $< -o $@
+	@rm -f $*.c
+
+%.distSummary: %.c ../global/distSummary.cpp
+	@echo "**** Constructing $@ ..."
+	@$(CXX) $(OPT) ../global/distSummary.cpp -include $< -o $@
+	@rm -f $*.c
+
+abstractor:
+	@echo "**** Constructing abstractor ..."
+	@$(CXX) $(OPT) ../src/abstractor.cpp ../src/psvn.cpp -o $@
+
+%.pdb: abstractor
+	@rm -f `basename $*`.abst `basename $*`.pdb `basename $*`.psvn
+	@echo "**** Running abstractor on `dirname $*`.psvn with `basename $*`.txt ..."
+	@./abstractor `dirname $*`.psvn `basename $*` < `basename $*`.txt > /dev/null
+	@make `basename $*`.distSummary
+	@echo "**** Constructing PDB `basename $*`.pdb ..."
+	@./`basename $*`.distSummary `basename $*`.pdb
+	@rm -f abstractor `basename $*`.distSummary
+
+%.dist_pdb: %.c ../global/dist_pdb.cpp
+	@echo "**** Constructing $@ ..."
+	@$(CXX) $(OPT) ../global/dist_pdb.cpp -include $< -o $@
+	@rm -f $*.c
 
 .PHONY: clean
 clean:
