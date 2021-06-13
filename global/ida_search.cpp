@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <stdlib.h>
 #include <unistd.h>
+#include <chrono>
 #include "inputOutput.h"
 #define INFINITY 10000 //May lower it later, have to read about it
 
@@ -89,7 +90,6 @@ pair<bool, unsigned> f_bounded_dfs_visit_1(unsigned g_value){
 
     original_history = hist;
 
-    h_value = get_h_value(state);
     f_value = g_value + h_value;
 
     if (f_value > bound){
@@ -118,8 +118,8 @@ pair<bool, unsigned> f_bounded_dfs_visit_1(unsigned g_value){
         apply_fwd_rule(ruleid, &state, &child);
         copy_state(&state, &child);
 
-
-        if (get_h_value(state) < INFINITY){
+        h_value = get_h_value(state);
+        if (h_value < INFINITY){
             path.push_back(ruleid);
             pair<bool, unsigned> ret_value = f_bounded_dfs_visit_1(cost);
             if (ret_value.first){
@@ -152,7 +152,9 @@ void ida_search_1(string state_description){
     }
 
     signal(SIGALRM, &sigalrm_handler);  // set a signal handler
-    alarm(60);  // set an alarm for 60 seconds from now
+    alarm(900);  // set an alarm for 900 seconds from now
+
+    auto t1 = chrono::high_resolution_clock::now();
 
     bound = get_h_value(state);
     //i = 0;
@@ -161,9 +163,14 @@ void ida_search_1(string state_description){
         hist = init_history;
         explored = 0;
         cout << "Nueva iter." << bound << "\n";
+        h_value = get_h_value(state);
         pair<bool, unsigned> ret_value = f_bounded_dfs_visit_1(0);
         if (ret_value.first){
+            auto t2 = chrono::high_resolution_clock::now();
+            chrono::milliseconds time_taken = chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 );
+            cout << "SOL. ENCONTRADA" << "\n";
             cout << "Costo sol: " << ret_value.second << "\n";
+            cout << "Tiempo transcurrido: " << time_taken.count() << "\n"; 
             return;
         }
         bound = ret_value.second;
@@ -177,8 +184,10 @@ void ida_search_1(string state_description){
 pair<bool, unsigned> f_bounded_dfs_visit_2(state_t state, unsigned bound, unsigned g_value){
     state_t child;
     unsigned f_value, h_value, cost, current_min;
-    int d, ruleid;
+    int d, ruleid, original_history;
     ruleid_iterator_t iter;
+
+    original_history = hist;
 
     h_value = get_h_value(state);
     f_value = g_value + h_value;
@@ -197,6 +206,13 @@ pair<bool, unsigned> f_bounded_dfs_visit_2(state_t state, unsigned bound, unsign
     init_fwd_iter(&iter, &state);
 
     while((ruleid = next_ruleid(&iter) ) >= 0){
+
+        if (!fwd_rule_valid_for_history(hist,ruleid)){
+            continue;
+        }
+        explored++;
+        //cout << "START HISTORY " << hist << "\n";
+        hist = next_fwd_history(hist, ruleid);
         cost = g_value + get_fwd_rule_cost(ruleid);
         apply_fwd_rule(ruleid, &state, &child);
 
@@ -211,7 +227,11 @@ pair<bool, unsigned> f_bounded_dfs_visit_2(state_t state, unsigned bound, unsign
 
         }
 
+        hist = original_history;
+
     }
+
+    return make_pair(false, current_min);
     
 
 }
@@ -225,15 +245,28 @@ void ida_search_2(string state_description){
         cout << "Error leyendo el estado inicial" << newline;
     }
 
+    signal(SIGALRM, &sigalrm_handler);  // set a signal handler
+    alarm(900);  // set an alarm for 900 seconds from now
+
+    auto t1 = chrono::high_resolution_clock::now();
+
     bound = get_h_value(state);
 
     while (true){
+        hist = init_history;
+        explored = 0;
         cout << "Nueva iter." << bound << "\n";
         pair<bool, unsigned> ret_value = f_bounded_dfs_visit_2(state, bound, 0);
         if (ret_value.first){
+            auto t2 = chrono::high_resolution_clock::now();
+            chrono::milliseconds time_taken = chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 );
+            cout << "SOL. ENCONTRADA" << "\n";
+            cout << "Costo sol: " << ret_value.second << "\n";
+            cout << "Tiempo transcurrido: " << time_taken.count() << "\n"; 
             return;
         }
         bound = ret_value.second;
+        cout << "Explored: " << explored << "\n";
     }
 
 }
