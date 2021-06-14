@@ -19,26 +19,26 @@ state_t state, child, abst_state, final_state;
 unsigned f_value, h_value, cost, bound;
 int hist,  explored, pdbNumber;
 vector<int> path;
+state_map_t * prueba;
 string newline = "\n";
+chrono::high_resolution_clock::time_point tstart, tend, tstartiter, tenditer;
 unsigned mtable0[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-unsigned mtable1[16] = {0, 1, 2, 3, 1, 2, 3, 4, 2, 3, 4, 5, 3, 4, 5, 6};
-unsigned mtable2[16] = {1, 0, 1, 2, 2, 1, 2, 3, 3, 2, 3, 4, 4, 3, 4, 5};
-unsigned mtable3[16] = {2, 1, 0, 1, 3, 2, 1, 2, 4, 3, 2, 3, 5, 4, 3, 4};
-unsigned mtable4[16] = {3, 2, 1, 0, 4, 3, 2, 1, 5, 4, 3, 2, 6, 5, 4, 3};
-unsigned mtable5[16] = {1, 2, 3, 4, 0, 1, 2, 3, 1, 2, 3, 4, 2, 3, 4, 5};
-unsigned mtable6[16] = {2, 1, 2, 3, 1, 0, 1, 2, 2, 1, 2, 3, 3, 2, 3, 4};
-unsigned mtable7[16] = {3, 2, 1, 2, 2, 1, 0, 1, 3, 2, 1, 2, 4, 3, 2, 3};
-unsigned mtable8[16] = {4, 3, 2, 1, 3, 2, 1, 0, 4, 3, 2, 1, 5, 4, 3, 2};
-unsigned mtable9[16] = {2, 3, 4, 5, 1, 2, 3, 4, 0, 1, 2, 3, 1, 2, 3, 4};
-unsigned mtable10[16] = {3, 2, 3, 4, 2, 1, 2, 3, 1, 0, 1, 2, 2, 1, 2, 3};
-unsigned mtable11[16] = {4, 3, 2, 3, 3, 2, 1, 2, 2, 1, 0, 1, 3, 2, 1, 2};
-unsigned mtable12[16] = {5, 4, 3, 2, 4, 3, 2, 1, 3, 2, 1, 0, 4, 3, 2, 1};
-unsigned mtable13[16] = {3, 4, 5, 6, 2, 3, 4, 5, 1, 2, 3, 4, 0, 1, 2, 3};
-unsigned mtable14[16] = {4, 3, 4, 5, 3, 2, 3, 4, 2, 1, 2, 3, 1, 0, 1, 2};
-unsigned mtable15[16] = {5, 4, 3, 4, 4, 3, 2, 3, 3, 2, 1, 2, 2, 1, 0, 1};
-unsigned * mtable[16] = {mtable0, mtable1, mtable2, mtable3, mtable4, mtable5, mtable6, mtable7, mtable8, 
-                        mtable9, mtable10, mtable11, mtable12, mtable13, mtable14, mtable15};
-
+unsigned mtable1[16] = {1, 0, 1, 2, 2, 1, 2, 3, 3, 2, 3, 4, 4, 3, 4, 5};
+unsigned mtable2[16] = {2, 1, 0, 1, 3, 2, 1, 2, 4, 3, 2, 3, 5, 4, 3, 4};
+unsigned mtable3[16] = {3, 2, 1, 0, 4, 3, 2, 1, 5, 4, 3, 2, 6, 5, 4, 3};
+unsigned mtable4[16] = {1, 2, 3, 4, 0, 1, 2, 3, 1, 2, 3, 4, 2, 3, 4, 5};
+unsigned mtable5[16] = {2, 1, 2, 3, 1, 0, 1, 2, 2, 1, 2, 3, 3, 2, 3, 4};
+unsigned mtable6[16] = {3, 2, 1, 2, 2, 1, 0, 1, 3, 2, 1, 2, 4, 3, 2, 3};
+unsigned mtable7[16] = {4, 3, 2, 1, 3, 2, 1, 0, 4, 3, 2, 1, 5, 4, 3, 2};
+unsigned mtable8[16] = {2, 3, 4, 5, 1, 2, 3, 4, 0, 1, 2, 3, 1, 2, 3, 4};
+unsigned mtable9[16] = {3, 2, 3, 4, 2, 1, 2, 3, 1, 0, 1, 2, 2, 1, 2, 3};
+unsigned mtable10[16] = {4, 3, 2, 3, 3, 2, 1, 2, 2, 1, 0, 1, 3, 2, 1, 2};
+unsigned mtable11[16] = {5, 4, 3, 2, 4, 3, 2, 1, 3, 2, 1, 0, 4, 3, 2, 1};
+unsigned mtable12[16] = {3, 4, 5, 6, 2, 3, 4, 5, 1, 2, 3, 4, 0, 1, 2, 3};
+unsigned mtable13[16] = {4, 3, 4, 5, 3, 2, 3, 4, 2, 1, 2, 3, 1, 0, 1, 2};
+unsigned mtable14[16] = {5, 4, 3, 4, 4, 3, 2, 3, 3, 2, 1, 2, 2, 1, 0, 1};
+unsigned mtable15[16] = {6, 5, 4, 3, 5, 4, 3, 2, 4, 3, 2, 1, 3, 2, 1, 0};
+unsigned * mtable[16] = {mtable0, mtable1, mtable2, mtable3, mtable4, mtable5, mtable6, mtable7, mtable8, mtable9, mtable10, mtable11, mtable12, mtable13, mtable14, mtable15};
 
 
 /* Hay dos versiones porque no sé si psvn me deja usar la regla al inverso así a lo malandro. La versión 1 supone que sí
@@ -95,6 +95,14 @@ void sigalrm_handler(int sig){
     exit(EXIT_SUCCESS);
 }
 
+void sigint_handler(int sig){
+    tend = chrono::high_resolution_clock::now();
+    chrono::milliseconds time_taken = chrono::duration_cast<std::chrono::milliseconds>( tend - tstart );   
+    cout << "Tiempo transcurrido: " << time_taken.count() << "\n"; 
+    cout << "Nodos explorados (Última iter.): " << explored << newline;
+    exit(EXIT_FAILURE);
+}
+
 //Constant memory
 pair<bool, unsigned> f_bounded_dfs_visit_1(unsigned g_value){
     unsigned current_min;
@@ -124,10 +132,8 @@ pair<bool, unsigned> f_bounded_dfs_visit_1(unsigned g_value){
             continue;
         }
         explored++;
-        //cout << "START HISTORY " << hist << "\n";
         hist = next_fwd_history(hist, ruleid);
         cost = g_value + get_fwd_rule_cost(ruleid);
-        //cout << cost << "\n";
         apply_fwd_rule(ruleid, &state, &child);
         copy_state(&state, &child);
 
@@ -158,7 +164,6 @@ pair<bool, unsigned> f_bounded_dfs_visit_1(unsigned g_value){
 
 void ida_search_1(string state_description){
     int64_t totalNodes, numAtD;  // counters
-    int i;
 
     if (read_state(state_description.c_str(), &state)==-1){
         cout << "Error leyendo el estado inicial" << newline;
@@ -166,12 +171,12 @@ void ida_search_1(string state_description){
     }
 
     signal(SIGALRM, &sigalrm_handler);  // set a signal handler
+    signal (SIGINT,&sigint_handler);
     alarm(900);  // set an alarm for 900 seconds from now
 
-    auto t1 = chrono::high_resolution_clock::now();
+    tstart = chrono::high_resolution_clock::now();
 
     bound = get_h_value(state);
-    //i = 0;
 
     while (true){
         hist = init_history;
@@ -180,11 +185,12 @@ void ida_search_1(string state_description){
         h_value = get_h_value(state);
         pair<bool, unsigned> ret_value = f_bounded_dfs_visit_1(0);
         if (ret_value.first){
-            auto t2 = chrono::high_resolution_clock::now();
-            chrono::milliseconds time_taken = chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 );
+            tend = chrono::high_resolution_clock::now();
+            chrono::milliseconds time_taken = chrono::duration_cast<std::chrono::milliseconds>( tend - tstart );
             cout << "SOL. ENCONTRADA" << "\n";
             cout << "Costo sol: " << ret_value.second << "\n";
             cout << "Tiempo transcurrido: " << time_taken.count() << "\n"; 
+            cout << "Nodos explorados (Última iter.): " << explored << newline;
             return;
         }
         bound = ret_value.second;
@@ -195,16 +201,21 @@ void ida_search_1(string state_description){
 
 
 //Linear memory
-pair<bool, unsigned> f_bounded_dfs_visit_2(state_t state, unsigned bound, unsigned g_value){
+/*pair<bool, unsigned> f_bounded_dfs_visit_2(state_t state, unsigned bound, unsigned g_value){
     state_t child;
     unsigned f_value, h_value, cost, current_min;
+    int * state_value;
     int d, ruleid, original_history;
     ruleid_iterator_t iter;
+
+    //char staterep[40];
 
     original_history = hist;
 
     h_value = get_h_value(state);
     f_value = g_value + h_value;
+
+    //sprint_state(staterep, 40, &state);
 
     if (f_value > bound){
         return make_pair(false, f_value);
@@ -215,6 +226,10 @@ pair<bool, unsigned> f_bounded_dfs_visit_2(state_t state, unsigned bound, unsign
         return make_pair(true, g_value);
     }
 
+    explored++;
+
+    state_map_add(prueba, &state, g_value);
+
     current_min = INFINITY; 
 
     init_fwd_iter(&iter, &state);
@@ -224,11 +239,16 @@ pair<bool, unsigned> f_bounded_dfs_visit_2(state_t state, unsigned bound, unsign
         if (!fwd_rule_valid_for_history(hist,ruleid)){
             continue;
         }
-        explored++;
-        //cout << "START HISTORY " << hist << "\n";
+
         hist = next_fwd_history(hist, ruleid);
         cost = g_value + get_fwd_rule_cost(ruleid);
         apply_fwd_rule(ruleid, &state, &child);
+
+        state_value = state_map_get(prueba, &child);
+        if ((state_value != NULL) && (*state_value <= cost)){
+            hist = original_history;
+            continue;
+        }
 
         if (get_h_value(child) < INFINITY){
             path.push_back(ruleid);
@@ -254,26 +274,29 @@ void ida_search_2(string state_description){
     state_t state;
     int64_t totalNodes, numAtD;  // counters
     unsigned bound;
+    //int i = 0;
 
     if (read_state(state_description.c_str(), &state)==-1){
         cout << "Error leyendo el estado inicial" << newline;
+        exit(EXIT_FAILURE);
     }
 
     signal(SIGALRM, &sigalrm_handler);  // set a signal handler
     alarm(900);  // set an alarm for 900 seconds from now
 
-    auto t1 = chrono::high_resolution_clock::now();
+    auto tstart = chrono::high_resolution_clock::now();
 
     bound = get_h_value(state);
 
     while (true){
+        prueba = new_state_map();
         hist = init_history;
         explored = 0;
         cout << "Nueva iter." << bound << "\n";
         pair<bool, unsigned> ret_value = f_bounded_dfs_visit_2(state, bound, 0);
         if (ret_value.first){
-            auto t2 = chrono::high_resolution_clock::now();
-            chrono::milliseconds time_taken = chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 );
+            auto tend = chrono::high_resolution_clock::now();
+            chrono::milliseconds time_taken = chrono::duration_cast<std::chrono::milliseconds>( tend - tstart );
             cout << "SOL. ENCONTRADA" << "\n";
             cout << "Costo sol: " << ret_value.second << "\n";
             cout << "Tiempo transcurrido: " << time_taken.count() << "\n"; 
@@ -281,9 +304,11 @@ void ida_search_2(string state_description){
         }
         bound = ret_value.second;
         cout << "Explored: " << explored << "\n";
+        destroy_state_map(prueba);
+        //i++;
     }
 
-}
+}*/
 
 int main(int argc, char **argv){
     string instance, pdb_name;
@@ -291,7 +316,7 @@ int main(int argc, char **argv){
     get_problem_instace(argv[1],instance);
     /*load_pdbs(abst, pdb, argv[2], pdbNumber);*/
     ida_search_1(instance);
-    reconstruct_solution(instance, newline, path);
+    //reconstruct_solution(instance, newline, path);
     cout << "FLAWLESS VICTORY\n";
 
     return 0;

@@ -56,7 +56,7 @@ def generate_n_puzzle_stdrep(n):
                 rhs[right], rhs[i] = rhs[i], rhs[right]
                 psvn_file.write(" ".join(lhs) + " => " + " ".join(rhs) + " LABEL BLANKRIGHT" + newline)
 
-        goal = "GOAL " + " ".join([str(i) for i in range(1, tile_number)]) + " b"  
+        goal = "GOAL b " + " ".join([str(i) for i in range(1, tile_number)])  
         psvn_file.write(goal + newline)
 
         psvn_file.close()
