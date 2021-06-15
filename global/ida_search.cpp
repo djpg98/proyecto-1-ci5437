@@ -13,13 +13,12 @@ using namespace std;
 
 //VERY IMPORTANT DO NOT FORGET UNDER ANY CIRCUMSTANCES: CHANGE MAX_LENGTH ARGUMENT IN SPRINT STATE
 
-abstraction_t * abst[5];
-state_map_t * pdb[5];
+abstraction_t * abst[16];
+state_map_t * pdb[16];
 state_t state, child, abst_state, final_state;
-unsigned f_value, h_value, cost, bound;
-int hist,  explored, pdbNumber;
+unsigned f_value, h_value, cost, bound, initial_bound;
+int hist,  explored, total_nodes, pdbNumber;
 vector<int> path;
-state_map_t * prueba;
 string newline = "\n";
 chrono::high_resolution_clock::time_point tstart, tend, tstartiter, tenditer;
 unsigned mtable0[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -47,7 +46,7 @@ unsigned * mtable[16] = {mtable0, mtable1, mtable2, mtable3, mtable4, mtable5, m
 
 /*This get_h_value just defines the manhattan distance heuristic. Later I will make sure it supports the others*/
 
-unsigned get_h_value(state_t state){
+/*unsigned get_h_value(state_t state){
     char staterep[40];
     unsigned h;
     int start, end, position, tile;
@@ -75,9 +74,9 @@ unsigned get_h_value(state_t state){
 
     return h;
 
-}
+}*/
 
-/*unsigned get_h_value(state_t state){
+unsigned get_h_value(state_t state){
     int * value_pointer;
     int total = 0;
     for (int i = 0; i <  pdbNumber; i++){
@@ -87,18 +86,18 @@ unsigned get_h_value(state_t state){
     }
 
     return total;
-}*/
+}
 
 void sigalrm_handler(int sig){
-    cout << "Explored: " << explored << "\n";
-    cout << "Time's up mate, maybe next time\n";
+    /*cout << "Explored: " << explored << "\n";
+    cout << "Time's up mate, maybe next time\n";*/
+    cout << initial_bound << ", " << bound << ", " << -1 << ", " << total_nodes << ", " << explored << ", false, " << 900000 << newline;
     exit(EXIT_SUCCESS);
 }
 
 void sigint_handler(int sig){
-    tend = chrono::high_resolution_clock::now();
     chrono::milliseconds time_taken = chrono::duration_cast<std::chrono::milliseconds>( tend - tstart );   
-    cout << "Tiempo transcurrido: " << time_taken.count() << "\n"; 
+    cout << newline << "Tiempo transcurrido: " << time_taken.count() << "\n"; 
     cout << "Nodos explorados (Última iter.): " << explored << newline;
     exit(EXIT_FAILURE);
 }
@@ -177,24 +176,29 @@ void ida_search_1(string state_description){
     tstart = chrono::high_resolution_clock::now();
 
     bound = get_h_value(state);
+    initial_bound = bound;
+    total_nodes = 0;
 
     while (true){
         hist = init_history;
         explored = 0;
-        cout << "Nueva iter." << bound << "\n";
+        //cout << "Nueva iter." << bound << "\n";
         h_value = get_h_value(state);
         pair<bool, unsigned> ret_value = f_bounded_dfs_visit_1(0);
         if (ret_value.first){
             tend = chrono::high_resolution_clock::now();
             chrono::milliseconds time_taken = chrono::duration_cast<std::chrono::milliseconds>( tend - tstart );
-            cout << "SOL. ENCONTRADA" << "\n";
+            /*cout << "SOL. ENCONTRADA" << "\n";
             cout << "Costo sol: " << ret_value.second << "\n";
             cout << "Tiempo transcurrido: " << time_taken.count() << "\n"; 
-            cout << "Nodos explorados (Última iter.): " << explored << newline;
+            cout << "Nodos explorados (Última iter.): " << explored << newline;*/
+            total_nodes = total_nodes + explored;
+            cout << initial_bound << ", " << bound << ", " << ret_value.second << ", " << total_nodes << ", " << explored << ", true, " << time_taken.count() << newline;
             return;
         }
         bound = ret_value.second;
-        cout << "Explored: " << explored << "\n";
+        //cout << "Explored: " << explored << "\n";
+        total_nodes = total_nodes + explored;
     }
 
 }
@@ -311,11 +315,17 @@ void ida_search_2(string state_description){
 }*/
 
 int main(int argc, char **argv){
+    vector<string>::iterator instanceIter;
+    vector<string> instances;
     string instance, pdb_name;
     pdbNumber = 3;
-    get_problem_instace(argv[1],instance);
-    /*load_pdbs(abst, pdb, argv[2], pdbNumber);*/
-    ida_search_1(instance);
+    get_all_instances(argv[1], instances);
+    //get_problem_instace(argv[1],instance);
+    cout << "value, valueF, solution, nodesT, nodesF, solution, sec" << newline;
+    load_pdbs(abst, pdb, argv[2], pdbNumber);
+    for (instanceIter = instances.begin(); instanceIter != instances.end(); instanceIter++){
+        ida_search_1(*instanceIter);
+    }
     //reconstruct_solution(instance, newline, path);
     cout << "FLAWLESS VICTORY\n";
 
