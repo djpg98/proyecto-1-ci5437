@@ -4,9 +4,11 @@
 #include <utility>
 #include <cstdint>
 #include <stdlib.h>
+#include <chrono>
 #include <map>
-#include "node.h"
+#include "node.hpp"
 #include "priority_queue.hpp"
+#include "inputOutput.h"
 #define INFINITY 1000 //May lower it later, have to read about it
 
 using namespace std;
@@ -17,19 +19,27 @@ using namespace std;
 state_t state;
 state_t* child;
 unsigned f_value, h_value, cost;
-int hist;
+int hist, pdbNumber;
 vector<int> path;
+chrono::high_resolution_clock::time_point tstart, tend, tstartiter, tenditer;
 string newline = "\n";
-unsigned mtable0[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-unsigned mtable1[9] = {0, 1, 2, 1, 2, 3, 2, 3, 4};
-unsigned mtable2[9] = {1, 0, 1, 2, 1, 2, 3, 2, 3};
-unsigned mtable3[9] = {2, 1, 0, 3, 2, 1, 4, 3, 2};
-unsigned mtable4[9] = {1, 2, 3, 0, 1, 2, 1, 2, 3};
-unsigned mtable5[9] = {2, 1, 2, 1, 0, 1, 2, 1, 2};
-unsigned mtable6[9] = {3, 2, 1, 2, 1, 0, 3, 2, 1};
-unsigned mtable7[9] = {2, 3, 4, 1, 2, 3, 0, 1, 2};
-unsigned mtable8[9] = {3, 2, 3, 2, 1, 2, 1, 0, 1};
-unsigned * mtable[9] = {mtable0, mtable1, mtable2, mtable3, mtable4, mtable5, mtable6, mtable7, mtable8};
+unsigned mtable0[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+unsigned mtable1[16] = {1, 0, 1, 2, 2, 1, 2, 3, 3, 2, 3, 4, 4, 3, 4, 5};
+unsigned mtable2[16] = {2, 1, 0, 1, 3, 2, 1, 2, 4, 3, 2, 3, 5, 4, 3, 4};
+unsigned mtable3[16] = {3, 2, 1, 0, 4, 3, 2, 1, 5, 4, 3, 2, 6, 5, 4, 3};
+unsigned mtable4[16] = {1, 2, 3, 4, 0, 1, 2, 3, 1, 2, 3, 4, 2, 3, 4, 5};
+unsigned mtable5[16] = {2, 1, 2, 3, 1, 0, 1, 2, 2, 1, 2, 3, 3, 2, 3, 4};
+unsigned mtable6[16] = {3, 2, 1, 2, 2, 1, 0, 1, 3, 2, 1, 2, 4, 3, 2, 3};
+unsigned mtable7[16] = {4, 3, 2, 1, 3, 2, 1, 0, 4, 3, 2, 1, 5, 4, 3, 2};
+unsigned mtable8[16] = {2, 3, 4, 5, 1, 2, 3, 4, 0, 1, 2, 3, 1, 2, 3, 4};
+unsigned mtable9[16] = {3, 2, 3, 4, 2, 1, 2, 3, 1, 0, 1, 2, 2, 1, 2, 3};
+unsigned mtable10[16] = {4, 3, 2, 3, 3, 2, 1, 2, 2, 1, 0, 1, 3, 2, 1, 2};
+unsigned mtable11[16] = {5, 4, 3, 2, 4, 3, 2, 1, 3, 2, 1, 0, 4, 3, 2, 1};
+unsigned mtable12[16] = {3, 4, 5, 6, 2, 3, 4, 5, 1, 2, 3, 4, 0, 1, 2, 3};
+unsigned mtable13[16] = {4, 3, 4, 5, 3, 2, 3, 4, 2, 1, 2, 3, 1, 0, 1, 2};
+unsigned mtable14[16] = {5, 4, 3, 4, 4, 3, 2, 3, 3, 2, 1, 2, 2, 1, 0, 1};
+unsigned mtable15[16] = {6, 5, 4, 3, 5, 4, 3, 2, 4, 3, 2, 1, 3, 2, 1, 0};
+unsigned * mtable[16] = {mtable0, mtable1, mtable2, mtable3, mtable4, mtable5, mtable6, mtable7, mtable8, mtable9, mtable10, mtable11, mtable12, mtable13, mtable14, mtable15};
 
 
 
@@ -70,7 +80,7 @@ unsigned get_h_value(state_t* state){
 }
 
 void a_star_search(string state_description){
-    int ruleid;
+    int ruleid, original_history;
     ruleid_iterator_t iter;
     hist = init_history;
 
@@ -87,17 +97,22 @@ void a_star_search(string state_description){
     h_value = get_h_value(node->state);
     q.Add(h_value, h_value, node);
 
-    char str_state[40];
+    tstart = chrono::high_resolution_clock::now();
 
     while( !q.Empty() ) {
         node = q.Top();
         q.Pop();
 
-        if (node->g < distance[hash_state(node->state)] || !distance.empty()) {
+        if (node->g < distance[hash_state(node->state)] || distance[hash_state(node->state)] == 0) {
             distance[hash_state(node->state)] = node->g;
 
             // Estado goal
             if (is_goal(node->state)) {
+                tend = chrono::high_resolution_clock::now();
+                chrono::milliseconds time_taken = chrono::duration_cast<std::chrono::milliseconds>( tend - tstart );
+                cout << "SOL. ENCONTRADA" << "\n";
+                cout << "Tiempo transcurrido: " << time_taken.count() << "\n"; 
+
                 node->extract_path(path);
                 return;
             }
@@ -109,6 +124,7 @@ void a_star_search(string state_description){
                 if (!fwd_rule_valid_for_history(hist,ruleid)){
                     continue;
                 }
+                original_history = hist;
                 hist = next_fwd_history(hist, ruleid);
                 child = new state_t;
                 apply_fwd_rule(ruleid, node->state, child);
@@ -119,7 +135,7 @@ void a_star_search(string state_description){
                     q.Add(f_value, f_value, node->make_node(child, ruleid));
                 }
 
-                hist = next_bwd_history(hist, ruleid);
+                hist = original_history;
             }
         }
 
@@ -129,34 +145,17 @@ void a_star_search(string state_description){
 
 }
 
-void reconstruct_solution(string state_description){
-    char str_state[40];
-    state_t state, child;
-    vector<int>::iterator iter;
-
-    if (read_state(state_description.c_str(), &state)==-1){
-        cout << "Error leyendo el estado inicial" << newline;
-    }
-
-    sprint_state(str_state, 40, &state);
-
-    cout << str_state << "\n";
-
-    for (iter = path.begin(); iter != path.end(); iter++){
-        apply_fwd_rule(*iter, &state, &child);
-
-        sprint_state(str_state, 40, &child);
-
-        cout << str_state << "\n";
-        copy_state(&state, &child);
-    }
-
-}
-
 int main(int argc, char **argv){
-    string hey = "1 8 2 b 4 3 7 6 5";
-    a_star_search(hey);
-    reconstruct_solution(hey);
+    string instance, pdb_name;
+    pdbNumber = 3;
+    get_problem_instace(argv[1], instance);
+    /*load_pdbs(abst, pdb, argv[2], pdbNumber);*/
+    tstart = chrono::high_resolution_clock::now();
+    a_star_search(instance);
+    reconstruct_solution(instance, newline, path);
+    cout << "FLAWLESS VICTORY\n";
+
     return 0;
+
 }
 
