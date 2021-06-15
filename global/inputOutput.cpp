@@ -34,6 +34,27 @@ void get_problem_instace(string file_name, string & instance){
     file.close();
 }
 
+void get_all_instances(string file_name, vector<string> & instances){
+    ifstream file;
+    string line;
+    int blank;
+
+    file.open(file_name, ios_base::in);
+
+    while(getline(file, line)){
+        if (line[0] != '0'){
+            blank = line.find(" 0");
+            line.replace(blank, 2, " b");
+        } else {
+            blank = 0;
+            line.replace(blank, 1, "b");
+        }
+        instances.push_back(line);
+    }
+
+    file.close();
+}
+
 void load_pdbs(abstraction_t** abst, state_map_t** pdb_maps, string name, int pdb_number){
     
     ifstream file;
