@@ -15,7 +15,7 @@ Una vez corrido dicho comando, se creará el archivo PSVN en la carpeta del prob
 ## Generador de distancia Manhattan
 El generador de la distancia Manhattan fue implementado en Python3, para usarlo corremos el comando:
 ```bash
-python <Nombre del generador>.py <Número de casillas del caso de n puzzle>
+python generate_m_distance.py <Número de casillas del caso de n puzzle>
 ```
 
 Esto nos arrojará en la terminal una fracción de codigo en C++, el cual tendremos que copiar y pegar en el archivo con el algoritmo informado que usaremos para buscar la solución al problema de n puzzle con distancia Manhattan.
