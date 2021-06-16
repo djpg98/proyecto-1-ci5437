@@ -24,6 +24,6 @@ make <Número de discos del caso>_disk_4peg_ToH.succ
 ## PDBs usadas por cada caso
 
 ### Caso Torres de 12 discos
-pdb_12_disk_0 == Abstracción particionando los 9 discos más pequeños.
-pdb_12_disk_1 == Abstracción particionando los 10 discos más pequeños.
-pdb_12_disk_2 == Abstracción particionando los 11 discos más pequeños.
+* pdb_12_disk_0 == Abstracción particionando los 9 discos más pequeños.
+* pdb_12_disk_1 == Abstracción particionando los 10 discos más pequeños.
+* pdb_12_disk_2 == Abstracción particionando los 11 discos más pequeños.
