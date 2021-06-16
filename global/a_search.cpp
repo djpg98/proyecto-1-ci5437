@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <chrono>
 #include <map>
+#include <algorithm>
 #include "node.hpp"
 #include "priority_queue.hpp"
 #include "inputOutput.h"
@@ -16,7 +17,9 @@ using namespace std;
 //VERY IMPORTANT DO NOT FORGET UNDER ANY CIRCUMSTANCES: CHANGE MAX_LENGTH ARGUMENT IN SPRINT STATE
 
 //state_map_t * h_map = new_state_map(); // contains the cost-to-goal for all states that have been generated
-state_t state;
+abstraction_t * abst[16];
+state_map_t * pdb[16];
+state_t state, abst_state;
 state_t* child;
 unsigned f_value, h_value, cost;
 int hist, pdbNumber;
@@ -79,6 +82,32 @@ unsigned get_h_value(state_t* state){
 
 }
 
+
+unsigned get_h_value_max_pdb(state_t* state){
+    int * value_pointer;
+    int total = 0;
+    for (int i = 0; i <  pdbNumber; i++){
+        abstract_state(abst[i], state, &abst_state);
+        value_pointer = state_map_get(pdb[i], &abst_state);
+        total = max(total, (*value_pointer));
+    }
+
+    return total;
+}
+
+unsigned get_h_value_additive_pdb(state_t* state){
+    int * value_pointer;
+    int total = 0;
+    for (int i = 0; i <  pdbNumber; i++){
+        abstract_state(abst[i], state, &abst_state);
+        value_pointer = state_map_get(pdb[i], &abst_state);
+        total += (*value_pointer);
+    }
+
+    return total;
+}
+
+
 void a_star_search(string state_description){
     int ruleid, original_history;
     ruleid_iterator_t iter;
@@ -94,7 +123,7 @@ void a_star_search(string state_description){
 
     Node* node = new Node(&state);
     distance[hash_state(node->state)] = 0;
-    h_value = get_h_value(node->state);
+    h_value = get_h_value_max_pdb(node->state);
     q.Add(h_value, h_value, node);
 
     tstart = chrono::high_resolution_clock::now();
@@ -129,7 +158,7 @@ void a_star_search(string state_description){
                 child = new state_t;
                 apply_fwd_rule(ruleid, node->state, child);
 
-                h_value = get_h_value(child);
+                h_value = get_h_value_max_pdb(child);
                 if (h_value < INFINITY) {
                     f_value = node->g + get_fwd_rule_cost(ruleid) + h_value;
                     q.Add(f_value, f_value, node->make_node(child, ruleid));
@@ -149,7 +178,7 @@ int main(int argc, char **argv){
     string instance, pdb_name;
     pdbNumber = 3;
     get_problem_instace(argv[1], instance);
-    /*load_pdbs(abst, pdb, argv[2], pdbNumber);*/
+    load_pdbs(abst, pdb, argv[2], pdbNumber);
     tstart = chrono::high_resolution_clock::now();
     a_star_search(instance);
     reconstruct_solution(instance, newline, path);
