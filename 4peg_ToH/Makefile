@@ -1,7 +1,7 @@
 CC = gcc
 CXX = g++
 OPT = -std=c++11 -g
-PSVNOPT =--state_map --abstraction --fwd_history_len=1 --bwd_history_len=0 --verbosity=1
+PSVNOPT = --state_map --abstraction --fwd_history_len=1 --bwd_history_len=0 --verbosity=1
 
 psvn2c_core.c:
 	cp ../src/psvn2c_core.c ./psvn2c_core.c

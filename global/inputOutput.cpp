@@ -1,7 +1,7 @@
 #include "inputOutput.h"
 
 void reconstruct_solution(string state_description, string newline, vector<int> path){
-    char str_state[40];
+    char str_state[120];
     state_t state, child;
     vector<int>::iterator iter;
 
@@ -9,14 +9,14 @@ void reconstruct_solution(string state_description, string newline, vector<int> 
         cout << "Error leyendo el estado inicial" << newline;
     }
 
-    sprint_state(str_state, 40, &state);
+    sprint_state(str_state, 120, &state);
 
     cout << str_state << "\n";
 
     for (iter = path.begin(); iter != path.end(); iter++){
         apply_fwd_rule(*iter, &state, &child);
 
-        sprint_state(str_state, 40, &child);
+        sprint_state(str_state, 120, &child);
 
         cout << str_state << "\n";
         copy_state(&state, &child);
