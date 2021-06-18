@@ -1,0 +1,11 @@
+value, valueF, solution, nodesT, nodesF, solution, sec
+2, 5, 5, 913, 470, true, 1
+5, 5, 5, 27, 27, true, 0
+5, 5, 5, 40, 40, true, 0
+4, 5, 5, 184, 140, true, 0
+5, 5, 5, 34, 34, true, 0
+4, 5, 5, 65, 32, true, 0
+4, 5, 5, 124, 79, true, 0
+3, 5, 5, 168, 154, true, 0
+3, 5, 5, 112, 92, true, 0
+3, 5, 5, 251, 167, true, 0

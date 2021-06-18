@@ -1,0 +1,12 @@
+value, valueF, solution, nodesT, nodesF, solution, sec
+7, 9, 9, 4081, 3229, true, 1
+6, 10, 10, 14864, 7442, true, 4
+6, 9, 9, 2276, 496, true, 0
+6, 11, 11, 82800, 15021, true, 23
+7, 9, 9, 3604, 2198, true, 0
+7, 9, 9, 1237, 796, true, 0
+6, 7, 7, 110, 98, true, 0
+6, 8, 8, 768, 599, true, 0
+5, 9, 9, 4684, 2844, true, 1
+7, 10, 10, 10258, 2481, true, 2
+FLAWLESS VICTORY
