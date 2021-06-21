@@ -18,8 +18,8 @@ psvn2c_abstraction.c:
 
 .PRECIOUS: %.c
 
-%.succ: %.c ../global/a_search.cpp
-	$(CXX) $(OPT) ../global/a_search.cpp -include $< ../global/inputOutput.cpp -o $@
+%.succ: %.c ../global/ida_search.cpp
+	$(CXX) $(OPT) ../global/ida_search.cpp -include $< ../global/inputOutput.cpp -o $@
 	rm -f $*.c
 
 %.dist: %.c ../global/dist.cpp
