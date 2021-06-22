@@ -7,10 +7,10 @@
 #include <chrono>
 #include <map>
 #include <algorithm>
+#include <unistd.h>
 #include "node.hpp"
 #include "priority_queue.hpp"
 #include "inputOutput.h"
-#define INFINITY 1000 //May lower it later, have to read about it
 
 using namespace std;
 
@@ -21,8 +21,8 @@ abstraction_t * abst[16];
 state_map_t * pdb[16];
 state_t state, abst_state;
 state_t* child;
-unsigned f_value, h_value, cost;
-int hist, pdbNumber;
+unsigned f_value, h_value, cost, initial_bound;
+int hist, pdbNumber, explored;
 vector<int> path;
 chrono::high_resolution_clock::time_point tstart, tend, tstartiter, tenditer;
 string newline = "\n";
@@ -107,6 +107,13 @@ unsigned get_h_value_additive_pdb(state_t* state){
     return total;
 }
 
+void sigalrm_handler(int sig){
+    /*cout << "Explored: " << explored << "\n";
+    cout << "Time's up mate, maybe next time\n";*/
+    cout << initial_bound << ", " << -1 << ", " <<  explored << ", false, " << 900000 << newline;
+    exit(EXIT_SUCCESS);
+}
+
 
 void a_star_search(string state_description){
     int ruleid, original_history;
@@ -118,12 +125,17 @@ void a_star_search(string state_description){
         return;
     }
 
+    signal(SIGALRM, &sigalrm_handler);  // set a signal handler
+    alarm(900);  // set an alarm for 900 seconds from now
+
     PriorityQueue<Node*> q;
     map<uint64_t, unsigned> distance;
 
     Node* node = new Node(&state);
     distance[hash_state(node->state)] = 0;
     h_value = get_h_value_max_pdb(node->state);
+    initial_bound = h_value;
+    explored = 0;
     q.Add(h_value, h_value, node);
 
     tstart = chrono::high_resolution_clock::now();
@@ -135,13 +147,15 @@ void a_star_search(string state_description){
         if (node->g < distance[hash_state(node->state)] || distance[hash_state(node->state)] == 0) {
             distance[hash_state(node->state)] = node->g;
 
+            explored++;
+
             // Estado goal
             if (is_goal(node->state)) {
                 tend = chrono::high_resolution_clock::now();
                 chrono::milliseconds time_taken = chrono::duration_cast<std::chrono::milliseconds>( tend - tstart );
-                cout << "SOL. ENCONTRADA" << "\n";
-                cout << "Tiempo transcurrido: " << time_taken.count() << "\n"; 
-
+                //cout << "SOL. ENCONTRADA" << "\n";
+                //cout << "Tiempo transcurrido: " << time_taken.count() << "\n"; 
+                cout << initial_bound << ", " << node->g << ", " << explored << ", true, " << time_taken.count() << newline;
                 node->extract_path(path);
                 return;
             }
@@ -175,14 +189,22 @@ void a_star_search(string state_description){
 }
 
 int main(int argc, char **argv){
+    vector<string>::iterator instanceIter;
+    vector<string> instances;
     string instance, pdb_name;
-    pdbNumber = 3;
-    get_problem_instace(argv[1], instance);
+    pdbNumber = stoi(argv[3]);
+    //get_all_instances(argv[1], instances);
+    get_problem_instace(argv[1],instance);
+    //cout << "value, solution, nodesT, solution, sec" << newline;
     load_pdbs(abst, pdb, argv[2], pdbNumber);
-    tstart = chrono::high_resolution_clock::now();
     a_star_search(instance);
-    reconstruct_solution(instance, newline, path);
-    cout << "FLAWLESS VICTORY\n";
+    //reconstruct_solution(instance, newline, path);
+    //path.clear();
+    /*for (instanceIter = instances.begin(); instanceIter != instances.end(); instanceIter++){
+        a_star_search(*instanceIter);
+        //reconstruct_solution(*instanceIter, newline, path);
+        path.clear();
+    }*/
 
     return 0;
 
