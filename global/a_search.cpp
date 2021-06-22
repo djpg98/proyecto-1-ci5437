@@ -4,28 +4,29 @@
 #include <utility>
 #include <cstdint>
 #include <stdlib.h>
+#include <unistd.h>
 #include <chrono>
 #include <map>
 #include <algorithm>
 #include "node.hpp"
 #include "priority_queue.hpp"
 #include "inputOutput.h"
-#define INFINITY 1000 //May lower it later, have to read about it
+#define INFINITY 10000 //May lower it later, have to read about it
 
 using namespace std;
 
 //VERY IMPORTANT DO NOT FORGET UNDER ANY CIRCUMSTANCES: CHANGE MAX_LENGTH ARGUMENT IN SPRINT STATE
 
-//state_map_t * h_map = new_state_map(); // contains the cost-to-goal for all states that have been generated
 abstraction_t * abst[16];
 state_map_t * pdb[16];
 state_t state, abst_state;
 state_t* child;
 unsigned f_value, h_value, cost;
-int hist, pdbNumber;
+int hist, explored, total_nodes, pdbNumber;
 vector<int> path;
-chrono::high_resolution_clock::time_point tstart, tend, tstartiter, tenditer;
+Node* node;
 string newline = "\n";
+chrono::high_resolution_clock::time_point tstart, tend, tstartiter, tenditer;
 unsigned mtable0[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 unsigned mtable1[16] = {1, 0, 1, 2, 2, 1, 2, 3, 3, 2, 3, 4, 4, 3, 4, 5};
 unsigned mtable2[16] = {2, 1, 0, 1, 3, 2, 1, 2, 4, 3, 2, 3, 5, 4, 3, 4};
@@ -45,19 +46,21 @@ unsigned mtable15[16] = {6, 5, 4, 3, 5, 4, 3, 2, 4, 3, 2, 1, 3, 2, 1, 0};
 unsigned * mtable[16] = {mtable0, mtable1, mtable2, mtable3, mtable4, mtable5, mtable6, mtable7, mtable8, mtable9, mtable10, mtable11, mtable12, mtable13, mtable14, mtable15};
 
 
+void sigalrm_handler(int sig){
+    char staterep[120];
+    sprint_state(staterep, 120, node->state);
+    cout << node->g << ", " << staterep << ", " << total_nodes << ", " << explored << ", false, " << 900 << newline;
+    exit(EXIT_SUCCESS);
+}
 
-/* Hay dos versiones porque no sé si psvn me deja usar la regla al inverso así a lo malandro. La versión 1 supone que sí
-   Por lo menos para n_puzzle funcionó a lo malandro. YEY
-*/
 
 /*This get_h_value just defines the manhattan distance heuristic. Later I will make sure it supports the others*/
-
-unsigned get_h_value(state_t* state){
-    char staterep[40];
+unsigned get_h_value_manhattan(state_t* state){
+    char staterep[120];
     unsigned h;
     int start, end, position, tile;
 
-    sprint_state(staterep, 40, state);
+    sprint_state(staterep, 120, state);
 
     string line(staterep);
 
@@ -109,23 +112,27 @@ unsigned get_h_value_additive_pdb(state_t* state){
 
 
 void a_star_search(string state_description){
-    int ruleid, original_history;
-    ruleid_iterator_t iter;
-    hist = init_history;
-
     if (read_state(state_description.c_str(), &state)==-1){
         cout << "Error leyendo el estado inicial" << newline;
         return;
     }
 
+    int ruleid, original_history;
+    ruleid_iterator_t iter;
+    hist = init_history;
     PriorityQueue<Node*> q;
     map<uint64_t, unsigned> distance;
+    char staterep[120];
 
-    Node* node = new Node(&state);
+    signal(SIGALRM, &sigalrm_handler);  // set a signal handler
+    alarm(900);  // set an alarm for 900 seconds from now
+
+    node = new Node(&state);
     distance[hash_state(node->state)] = 0;
     h_value = get_h_value_max_pdb(node->state);
     q.Add(h_value, h_value, node);
 
+    total_nodes = 1;
     tstart = chrono::high_resolution_clock::now();
 
     while( !q.Empty() ) {
@@ -134,14 +141,20 @@ void a_star_search(string state_description){
 
         if (node->g < distance[hash_state(node->state)] || distance[hash_state(node->state)] == 0) {
             distance[hash_state(node->state)] = node->g;
+            explored++;
 
             // Estado goal
             if (is_goal(node->state)) {
                 tend = chrono::high_resolution_clock::now();
                 chrono::milliseconds time_taken = chrono::duration_cast<std::chrono::milliseconds>( tend - tstart );
-                cout << "SOL. ENCONTRADA" << "\n";
-                cout << "Tiempo transcurrido: " << time_taken.count() << "\n"; 
-
+                sprint_state(staterep, 120, node->state);
+                
+                /*
+                map<uint64_t, unsigned>::iterator best
+                    = max_element(distance.begin(),distance.end(),[] (const pair<char,int>& a, const pair<char,int>& b)->bool{ return a.second < b.second; } );
+                cout << best->first << " , " << best->second << "\n";
+                */
+                cout << node->g << ", " << staterep << ", " << total_nodes << ", " << explored << ", true, " << time_taken.count() << newline;
                 node->extract_path(path);
                 return;
             }
@@ -153,6 +166,7 @@ void a_star_search(string state_description){
                 if (!fwd_rule_valid_for_history(hist,ruleid)){
                     continue;
                 }
+                total_nodes++;
                 original_history = hist;
                 hist = next_fwd_history(hist, ruleid);
                 child = new state_t;
@@ -167,6 +181,9 @@ void a_star_search(string state_description){
                 hist = original_history;
             }
         }
+        else{
+            delete node;
+        }
 
 
     }
@@ -175,16 +192,13 @@ void a_star_search(string state_description){
 }
 
 int main(int argc, char **argv){
-    string instance, pdb_name;
+    string pdb_name, instance;
     pdbNumber = 3;
     get_problem_instace(argv[1], instance);
     load_pdbs(abst, pdb, argv[2], pdbNumber);
-    tstart = chrono::high_resolution_clock::now();
     a_star_search(instance);
-    reconstruct_solution(instance, newline, path);
-    cout << "FLAWLESS VICTORY\n";
+    // reconstruct_solution(instance, newline, path);
 
     return 0;
 
 }
-

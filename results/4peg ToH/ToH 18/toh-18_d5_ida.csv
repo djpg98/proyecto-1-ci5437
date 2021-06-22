@@ -1,0 +1,12 @@
+value, valueF, solution, nodesT, nodesF, solution, sec
+3, 3, 3, 4, 4, true, 0
+4, 4, 4, 12, 12, true, 0
+3, 3, 3, 3, 3, true, 0
+2, 2, 2, 5, 5, true, 0
+1, 1, 1, 1, 1, true, 0
+3, 3, 3, 3, 3, true, 0
+3, 3, 3, 3, 3, true, 0
+2, 2, 2, 5, 5, true, 0
+1, 1, 1, 1, 1, true, 0
+3, 3, 3, 4, 4, true, 0
+Error leyendo el estado inicial

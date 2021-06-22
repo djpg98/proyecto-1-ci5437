@@ -94,7 +94,7 @@ unsigned get_h_value(state_t state){
     return total;
 }
 
-/*unsigned get_h_value(state_t state){
+unsigned get_h_value_max_pdb(state_t state){
     int * value_pointer;
     int total = 0;
     for (int i = 0; i <  pdbNumber; i++){
@@ -104,7 +104,7 @@ unsigned get_h_value(state_t state){
     }
 
     return total;
-}*/
+}
 
 void sigalrm_handler(int sig){
     cout << initial_bound << ", " << bound << ", " << -1 << ", " << total_nodes << ", " << explored << ", false, " << 900000 << newline;
@@ -156,7 +156,7 @@ pair<bool, unsigned> f_bounded_dfs_visit_1(unsigned g_value){
         apply_fwd_rule(ruleid, &state, &child);
         copy_state(&state, &child);
 
-        h_value = get_h_value(state);
+        h_value = get_h_value_max_pdb(state);
         if (h_value < INFINITY){
             path.push_back(ruleid);
             pair<bool, unsigned> ret_value = f_bounded_dfs_visit_1(cost);
@@ -194,14 +194,15 @@ void ida_search_1(string state_description){
 
     tstart = chrono::high_resolution_clock::now();
 
-    bound = get_h_value(state);
+    bound = get_h_value_max_pdb(state);
     initial_bound = bound;
     total_nodes = 0;
 
     while (true){
         hist = init_history;
         explored = 0;
-        h_value = get_h_value(state);
+        //cout << "Nueva iter." << bound << "\n";
+        h_value = get_h_value_max_pdb(state);
         pair<bool, unsigned> ret_value = f_bounded_dfs_visit_1(0);
         if (ret_value.first){
             tend = chrono::high_resolution_clock::now();
@@ -325,6 +326,9 @@ int main(int argc, char **argv){
     string instance, pdb_name;
     pdbNumber = stoi(argv[3]);
     get_problem_instace(argv[1],instance);
+    /*pdbNumber = 9;
+    get_all_instances(argv[1], instances);
+    cout << "value, valueF, solution, nodesT, nodesF, solution, sec" << newline;*/
     load_pdbs(abst, pdb, argv[2], pdbNumber);
     ida_search_1(instance);
     //cout << "FLAWLESS VICTORY\n";
