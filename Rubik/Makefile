@@ -1,6 +1,6 @@
 CC = gcc
 CXX = g++
-OPT = -std=c++11 -g -o3
+OPT = -std=c++11 -g -O3
 PSVNOPT = --state_map --abstraction --fwd_history_len=1 --bwd_history_len=0 --verbosity=1
 
 psvn2c_core.c:

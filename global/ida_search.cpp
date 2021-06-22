@@ -129,7 +129,7 @@ pair<bool, unsigned> f_bounded_dfs_visit_1(unsigned g_value){
         return make_pair(false, f_value);
     }
 
-    if (h_value == 0){
+    if (is_goal(&state)){
         return make_pair(true, g_value);
     }
 
@@ -330,7 +330,7 @@ int main(int argc, char **argv){
     vector<string>::iterator instanceIter;
     vector<string> instances;
     string instance, pdb_name;
-    pdbNumber = 3;
+    pdbNumber = 9;
     get_all_instances(argv[1], instances);
     //get_problem_instace(argv[1],instance);
     cout << "value, valueF, solution, nodesT, nodesF, solution, sec" << newline;
