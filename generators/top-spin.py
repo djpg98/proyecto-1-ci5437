@@ -23,10 +23,11 @@ def top_spin_n_k_stdrep(n, k):
         psvn_file.write('#DOMAIN' + newline)
         psvn_file.write(str(n) + newline)
         psvn_file.write(newline)
-        psvn_file.write(" ".join(n * [str(n)]) + newline)
+        psvn_file.write(" ".join(n * [str(n + 1)]) + newline)
         psvn_file.write(newline)
 
-        spinning_pieces = [f'S{i}' for i in range(1, k + 1)]
+        #spinning_pieces = [f'S{i}' for i in range(1, k + 1)]
+        spinning_pieces = ['W', 'X', 'Y', 'Z']
         spinning_pieces_inverted = spinning_pieces[:]
         spinning_pieces_inverted.reverse()
 
@@ -50,7 +51,6 @@ def top_spin_n_k_stdrep(n, k):
 
 
         psvn_file.write(newline)
-        psvn_file.write("GOAL" + newline)
 
         order = [str(i) for i in range(n)]
 
@@ -58,7 +58,7 @@ def top_spin_n_k_stdrep(n, k):
 
             segments = break_list_at(order, i)
             new_order = segments[1] + segments[0]
-            psvn_file.write(" ".join(new_order) + newline)
+            psvn_file.write("GOAL " + " ".join(new_order) + newline)
 
 try:
     top_spin_n_k_stdrep(int(sys.argv[1]), int(sys.argv[2]))

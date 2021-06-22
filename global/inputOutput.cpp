@@ -42,13 +42,13 @@ void get_all_instances(string file_name, vector<string> & instances){
     file.open(file_name, ios_base::in);
 
     while(getline(file, line)){
-        if (line[0] != '0'){
+        /*if (line[0] != '0'){
             blank = line.find(" 0");
             line.replace(blank, 2, " b");
         } else {
             blank = 0;
             line.replace(blank, 1, "b");
-        }
+        }*/
         instances.push_back(line);
     }
 

@@ -1,0 +1,14 @@
+Índice de pdb:
+
+Para el 12-4
+
+- pdb12-4 son 4 pdbs donde solo se consideran tres números
+- pdb12-4B son 3 pdbs donde solo se consideran cuatro números
+- pdb12-4C son 2 pdbs donde solo se consideran seis números
+
+Pata el 14-4
+- pdb14-4 son 4 pdbs que consideran 4 números (La última repite el 0 y el 1 para que fueran del mismo tamaño)
+- pdb14-4B son 3 pdbs que consideran 5 números (La última repite el 0)
+- pdb12-4C son 2 pdbs que consideran 7 números
+
+Para el 17-4
