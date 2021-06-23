@@ -14,5 +14,7 @@ map Tile 13 b
 map Tile 14 b
 map Tile 15 b
 map Tile 16 b
-map Tile 20 b
-map Tile 21 b
+map Tile 18 b
+map Tile 19 b
+map Tile 23 b
+map Tile 24 b

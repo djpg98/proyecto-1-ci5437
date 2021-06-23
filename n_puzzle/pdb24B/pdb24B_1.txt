@@ -6,6 +6,7 @@ map Tile 7 b
 map Tile 10 b
 map Tile 11 b
 map Tile 12 b
+map Tile 13 b
 map Tile 15 b
 map Tile 16 b
 map Tile 17 b
