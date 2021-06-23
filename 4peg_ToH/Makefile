@@ -32,6 +32,11 @@ psvn2c_abstraction.c:
 	@$(CXX) $(OPT) ../global/distSummary.cpp -include $< -o $@
 	@rm -f $*.c
 
+%.distSummaryNOP: %.c ../global/distSummaryNOP.cpp
+	@echo "**** Constructing $@ ..."
+	@$(CXX) $(OPT) ../global/distSummaryNOP.cpp -include $< -o $@
+	@rm -f $*.c
+
 abstractor:
 	@echo "**** Constructing abstractor ..."
 	@$(CXX) $(OPT) ../src/abstractor.cpp ../src/psvn.cpp -o $@
