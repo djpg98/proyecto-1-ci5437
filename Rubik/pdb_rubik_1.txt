@@ -8,23 +8,17 @@ map COLOUR WHITE NOCOLOR
 
 project 2
 project 4
-project 5
 project 6
 project 8
 
-project 9
 project 10
-project 11
 project 12
-project 13
 project 14
-project 15
 project 16
 
 project 18
 project 20
 project 22
-project 23
 project 24
 
 project 26
@@ -33,12 +27,10 @@ project 30
 project 32
 
 project 34
-project 35
 project 36
 project 38
 project 40
 
-project 41
 project 42
 project 44
 project 46

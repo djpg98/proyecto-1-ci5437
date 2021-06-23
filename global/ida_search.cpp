@@ -324,9 +324,13 @@ int main(int argc, char **argv){
     vector<string>::iterator instanceIter;
     vector<string> instances;
     string instance, pdb_name;
+<<<<<<< HEAD
+    pdbNumber = 6;
+=======
     pdbNumber = stoi(argv[3]);
     get_problem_instace(argv[1],instance);
     /*pdbNumber = 9;
+>>>>>>> 6e0673fabfbd44d1e0e900d4bea849190256e0c2
     get_all_instances(argv[1], instances);
     cout << "value, valueF, solution, nodesT, nodesF, solution, sec" << newline;*/
     load_pdbs(abst, pdb, argv[2], pdbNumber);
