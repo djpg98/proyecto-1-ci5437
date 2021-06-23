@@ -330,7 +330,7 @@ int main(int argc, char **argv){
     vector<string>::iterator instanceIter;
     vector<string> instances;
     string instance, pdb_name;
-    pdbNumber = 9;
+    pdbNumber = 6;
     get_all_instances(argv[1], instances);
     //get_problem_instace(argv[1],instance);
     cout << "value, valueF, solution, nodesT, nodesF, solution, sec" << newline;
