@@ -24,7 +24,6 @@ int main(int argc, char **argv) {
     // add goal states
     first_goal_state(&state, &d);
     do {
-        state_map_add(map, &state, 0);
         open.Add(0, 0, state);
     } while( next_goal_state(&state, &d) );
 
@@ -46,9 +45,9 @@ int main(int argc, char **argv) {
         
         // check if we already expanded this state.
         // (entries on the open list are not deleted if a cheaper path to a state is found)
-        const int *best_dist = state_map_get(map, &state);
+        /*const int *best_dist = state_map_get(map, &state);
         assert(best_dist != NULL);
-        if( *best_dist < d ) continue;
+        if( *best_dist < d ) continue;*/
         
         numAtD++;
         totalNodes++;
@@ -63,7 +62,7 @@ int main(int argc, char **argv) {
             // there is a new cheaper way to get to this child.
             const int *old_child_d = state_map_get(map, &child);
             // add to open with the new distance
-            state_map_add(map, &child, child_d);
+            //state_map_add(map, &child, child_d);
             open.Add(child_d, child_d, child);
         }
     }
