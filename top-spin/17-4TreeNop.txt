@@ -1,0 +1,6 @@
+17 states at distance 0
+289 states at distance 1
+4913 states at distance 2
+83521 states at distance 3
+1419857 states at distance 4
+24137569 states at distance 5

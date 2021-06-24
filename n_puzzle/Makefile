@@ -18,8 +18,8 @@ psvn2c_abstraction.c:
 
 .PRECIOUS: %.c
 
-%.succ: %.c ../global/a_search.cpp
-	$(CXX) $(OPT) ../global/a_search.cpp -include $< ../global/inputOutput.cpp -o $@
+%.succ: %.c ../global/ida_search_puzzle.cpp
+	$(CXX) $(OPT) ../global/ida_search_puzzle.cpp -include $< ../global/inputOutput.cpp -o $@
 	rm -f $*.c
 
 %.dist: %.c ../global/dist.cpp
@@ -30,6 +30,11 @@ psvn2c_abstraction.c:
 %.distSummary: %.c ../global/distSummary.cpp
 	@echo "**** Constructing $@ ..."
 	@$(CXX) $(OPT) ../global/distSummary.cpp -include $< -o $@
+	@rm -f $*.c
+
+%.distSummaryNOP: %.c ../global/distSummaryNOP.cpp
+	@echo "**** Constructing $@ ..."
+	@$(CXX) $(OPT) ../global/distSummaryNOP.cpp -include $< -o $@
 	@rm -f $*.c
 
 abstractor:
