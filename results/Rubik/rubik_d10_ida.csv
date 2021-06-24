@@ -1,0 +1,11 @@
+value, valueF, solution, nodesT, nodesF, solution, sec
+7, 8, 8, 66, 48, true, 0
+6, 8, 8, 1101, 741, true, 2
+7, 8, 8, 167, 137, true, 0
+7, 10, 10, 9964, 7927, true, 21
+4, 4, 4, 24, 24, true, 0
+8, 9, 9, 512, 395, true, 1
+5, 7, 7, 252, 99, true, 0
+7, 7, 7, 50, 50, true, 0
+7, 7, 7, 71, 71, true, 0
+7, 8, 8, 151, 118, true, 0
