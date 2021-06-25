@@ -193,7 +193,7 @@ void a_star_search(string state_description){
 
 int main(int argc, char **argv){
     string pdb_name, instance;
-    pdbNumber = 3;
+    pdbNumber = 6;
     get_problem_instace(argv[1], instance);
     load_pdbs(abst, pdb, argv[2], pdbNumber);
     a_star_search(instance);
